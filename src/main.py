@@ -25,6 +25,7 @@ POSTS_DIR = "content/posts"
 
 PAGE_SLUG_CACHE = ".cache/page-slugs.json"
 IMAGE_MANIFEST_PATH = ".cache/image-manifest.json"
+GENERATED_THEME_PATH = "assets/css/generated.daisyui.css"
 
 
 def load_previous_slugs():
@@ -104,6 +105,122 @@ def has_file_changed(filepath, cache_dir=".cache"):
     with open(cache_file, "w") as f:
         f.write(file_hash)
     return True
+
+
+def normalize_theme_config(config):
+    theme_config = config.get("theme")
+
+    if isinstance(theme_config, str):
+        normalized = {"default": theme_config}
+    elif isinstance(theme_config, dict):
+        normalized = dict(theme_config)
+    else:
+        normalized = {}
+
+    default_theme = (
+        normalized.get("default")
+        or normalized.get("preset")
+        or normalized.get("name")
+        or "dracula"
+    )
+    normalized["default"] = default_theme
+
+    include_candidates = normalized.get("include") or normalized.get("presets")
+    if not include_candidates:
+        include_candidates = []
+    elif not isinstance(include_candidates, list):
+        include_candidates = [include_candidates]
+
+    ordered = []
+    seen = set()
+    for entry in include_candidates:
+        if not entry or entry in seen:
+            continue
+        ordered.append(entry)
+        seen.add(entry)
+    if default_theme and default_theme not in seen:
+        ordered.insert(0, default_theme)
+    normalized["include"] = ordered
+
+    config["theme"] = normalized
+    return normalized
+
+
+def write_theme_file(config, output_path=GENERATED_THEME_PATH):
+    theme = config.get("theme") or {}
+    include = theme.get("include") or []
+    custom_raw = theme.get("custom")
+
+    def format_value(value):
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return str(value)
+        if isinstance(value, str):
+            if not value:
+                return "\"\""
+            if re.search(r"[\s;:\"]", value):
+                return json.dumps(value)
+            return value
+        return json.dumps(value)
+
+    names = []
+    seen = set()
+    for entry in include:
+        if not entry or entry in seen:
+            continue
+        names.append(entry)
+        seen.add(entry)
+
+    css_blocks = []
+
+    if names:
+        joined_names = ", ".join(json.dumps(name) for name in names)
+        css_blocks.append(
+            '@plugin "daisyui" {\n  themes: (' + joined_names + ');\n}'
+        )
+    else:
+        css_blocks.append('@plugin "daisyui" {\n  themes: all;\n}')
+
+    custom_items = custom_raw.items() if isinstance(custom_raw, dict) else []
+    for name, values in custom_items:
+        if not name or not isinstance(values, dict):
+            continue
+
+        value_pairs = []
+        seen_keys = set()
+
+        if "name" in values:
+            value_pairs.append(("name", values["name"]))
+            seen_keys.add("name")
+        else:
+            value_pairs.append(("name", name))
+            seen_keys.add("name")
+
+        if "default" in values:
+            value_pairs.append(("default", values["default"]))
+            seen_keys.add("default")
+        else:
+            value_pairs.append(("default", theme.get("default") == name))
+            seen_keys.add("default")
+
+        for key, value in values.items():
+            if key in seen_keys:
+                continue
+            value_pairs.append((key, value))
+            seen_keys.add(key)
+
+        lines = ["@plugin \"daisyui/theme\" {"]
+        for key, value in value_pairs:
+            lines.append(f"  {key}: {format_value(value)};")
+        lines.append("}")
+        css_blocks.append("\n".join(lines))
+
+    css_content = "\n\n".join(css_blocks) + "\n"
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(css_content)
 
 
 MARKDOWN_EXTENSIONS = [
@@ -440,7 +557,9 @@ def main():
         return
 
     with open(CONFIG_FILE, "r") as f:
-        site_config = yaml.safe_load(f)
+        site_config = yaml.safe_load(f) or {}
+    normalize_theme_config(site_config)
+    write_theme_file(site_config)
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     templates = load_templates(env)
     image_manifest = load_image_manifest()

@@ -2,10 +2,10 @@ import { defineConfig } from "vite";
 import dotenv from 'dotenv';
 import tailwindcss from "@tailwindcss/vite";
 import { execSync } from 'child_process';
-import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import YAML from 'yaml';
 import { processImages } from './src/image-preprocess.mjs';
 
 dotenv.config();
@@ -15,10 +15,121 @@ const __dirname = path.dirname(__filename);
 
 const inputDir = path.join(__dirname, '/assets/images');
 const outputDir = path.join(__dirname, '/assets/images-processed');
+const siteConfigPath = path.join(__dirname, 'config.yaml');
+const generatedThemeCssPath = path.join(__dirname, 'assets/css/generated.daisyui.css');
+
+const loadSiteConfig = () => {
+  try {
+    const raw = fs.readFileSync(siteConfigPath, 'utf8');
+    return YAML.parse(raw) || {};
+  } catch (err) {
+    console.error('[config] Unable to read config.yaml', err);
+    return {};
+  }
+};
+
+const generateDaisyUiThemeFile = () => {
+  const siteConfig = loadSiteConfig();
+  const themeConfig = siteConfig.theme || {};
+
+  const defaultTheme = typeof themeConfig.default === 'string' ? themeConfig.default.trim() : '';
+
+  const includeRaw = Array.isArray(themeConfig.include)
+    ? themeConfig.include
+    : themeConfig.include
+    ? [themeConfig.include]
+    : [];
+
+  const seenNames = new Set();
+  const names = [];
+  if (defaultTheme) {
+    const trimmed = defaultTheme.trim();
+    if (trimmed) {
+      seenNames.add(trimmed);
+      names.push(trimmed);
+    }
+  }
+  includeRaw.forEach((entry) => {
+    if (typeof entry !== 'string') return;
+    const trimmed = entry.trim();
+    if (!trimmed || seenNames.has(trimmed)) return;
+    seenNames.add(trimmed);
+    names.push(trimmed);
+  });
+
+  const formatValue = (value) => {
+    if (typeof value === 'boolean') {
+      return value ? 'true' : 'false';
+    }
+    if (typeof value === 'number') {
+      return String(value);
+    }
+    if (typeof value === 'string') {
+      if (value === '') {
+        return '""';
+      }
+      if (/\s|;|:|"/.test(value)) {
+        return JSON.stringify(value);
+      }
+      return value;
+    }
+    return JSON.stringify(value);
+  };
+
+  const blocks = [];
+
+  if (names.length) {
+    const joined = names.map((name) => JSON.stringify(name)).join(', ');
+    blocks.push(`@plugin "daisyui" {\n  themes: (${joined});\n}`);
+  } else {
+    blocks.push('@plugin "daisyui" {\n  themes: all;\n}');
+  }
+
+  const customRaw = themeConfig.custom;
+  if (customRaw && typeof customRaw === 'object') {
+    for (const [name, values] of Object.entries(customRaw)) {
+      if (!name || typeof values !== 'object' || values === null) {
+        continue;
+      }
+
+      const lines = ['@plugin "daisyui/theme" {'];
+      const seenKeys = new Set();
+
+      const emitKey = (key, value) => {
+        if (seenKeys.has(key)) return;
+        seenKeys.add(key);
+        lines.push(`  ${key}: ${formatValue(value)};`);
+      };
+
+      emitKey('name', Object.prototype.hasOwnProperty.call(values, 'name') ? values.name : name);
+
+      if (Object.prototype.hasOwnProperty.call(values, 'default')) {
+        emitKey('default', values.default);
+      }
+
+      for (const [key, value] of Object.entries(values)) {
+        emitKey(key, value);
+      }
+
+      if (!seenKeys.has('default')) {
+        const isDefault = defaultTheme && defaultTheme === name;
+        emitKey('default', isDefault);
+      }
+
+      lines.push('}');
+      blocks.push(lines.join('\n'));
+    }
+  }
+
+  fs.mkdirSync(path.dirname(generatedThemeCssPath), { recursive: true });
+  fs.writeFileSync(generatedThemeCssPath, `${blocks.join('\n\n')}\n`, 'utf8');
+};
 
 processImages(inputDir, outputDir).catch(e =>
   console.error('[images] initial processing failed', e)
 );
+
+generateDaisyUiThemeFile();
 
 const pythonexecutable = process.env.PY_EXECUTABLE;
 
@@ -70,6 +181,14 @@ const py_build_plugin = () => {
   return {
     name: 'builder-ssg',
     configureServer(server) {
+      const regenerateThemes = () => {
+        try {
+          generateDaisyUiThemeFile();
+        } catch (e) {
+          console.error('[theme] failed to regenerate DaisyUI theme file', e);
+        }
+      };
+
       const build = (file = null) => {
         const command = file
           ? `${pythonexecutable} src/main.py --file ${file}`
@@ -88,20 +207,26 @@ const py_build_plugin = () => {
 
       build();
 
-      server.watcher.on('all', (event, path) => {
+      server.watcher.on('all', (event, filePath) => {
         if (!ready) {
           return;
         }
 
-        if (path.includes('/content/') || path.includes('/templates/')) {
+        if (filePath.endsWith('config.yaml')) {
+          regenerateThemes();
+          build();
+          return;
+        }
+
+        if (filePath.includes('/content/') || filePath.includes('/templates/')) {
           if (event === 'change') {
-            const buildTarget = path.includes('/templates/') ? null : path;
+            const buildTarget = filePath.includes('/templates/') ? null : filePath;
             build(buildTarget);
           } else if (event === 'add' || event === 'unlink') {
             build();
           }
         }
-        if (event === 'change' && path.includes('/assets/css/')) {
+        if (event === 'change' && filePath.includes('/assets/css/')) {
           build();
         }
         if (event === 'unlink') { // if html files are deleted

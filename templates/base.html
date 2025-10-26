@@ -1,5 +1,6 @@
+{% set active_theme = site.theme.default if site.theme is defined and site.theme.default is defined else (site.theme if site.theme is defined else "dracula") %}
 <!DOCTYPE html>
-<html lang="en" data-theme="dracula">
+<html lang="en" data-theme="{{ active_theme }}">
 
 <head>
   <meta charset="UTF-8">
@@ -7,8 +8,6 @@
   <title>{{ page.title }} | {{ site.site_name }}</title>
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/syntax.css">
-  <html lang="en" data-theme="{{ site.theme }}">
-  </html>
 </head>
 
 <body class="pt-24 min-h-screen flex flex-col">
