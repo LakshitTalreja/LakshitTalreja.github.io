@@ -537,14 +537,25 @@ def parse_file(filepath, pygments_theme, markdown_config=None):
     html_data = md.convert(markdown_data)
     md.reset()
 
-    slug = os.path.splitext(os.path.basename(filepath))[0]
-    rel_posts = os.path.normpath(POSTS_DIR)
-    if os.path.normpath(filepath).startswith(rel_posts):
-        page_config["url"] = f"/posts/{slug}"
-    elif slug == "index":
-        page_config["url"] = "/"
+    rel_path = os.path.relpath(filepath, CONTENT_DIR)
+    
+    if rel_path.startswith(".."):
+         # Fallback to simple filename based slug for safety or treat as root
+         slug = os.path.splitext(os.path.basename(filepath))[0]
+         url_path = slug
     else:
-        page_config["url"] = f"/{slug}"
+         url_path = os.path.splitext(rel_path)[0]
+
+    # Normalize Windows paths
+    url_path = url_path.replace(os.sep, "/")
+
+    if url_path == "index":
+        page_config["url"] = "/"
+    elif url_path.endswith("/index"):
+        # e.g. sub/index -> /sub/
+        page_config["url"] = "/" + url_path[:-5]
+    else:
+        page_config["url"] = "/" + url_path
 
     # Normalize date to YYYY-MM-DD string
     if "date" in page_config and page_config["date"]:
@@ -590,7 +601,7 @@ def render_page(
     image_manifest=None,
     all_posts=None,
 ):
-    layout = page_config.get("layout")
+    layout = page_config.get("layout") or "post"
     if layout not in templates:
         available = ", ".join(sorted(templates.keys())) or "none"
         print(
@@ -859,9 +870,12 @@ def main():
         current_slugs = set()
         previous_slugs = load_previous_slugs()
 
-        for filename in os.listdir(CONTENT_DIR):
-            if filename.endswith(".md"):
-                filepath = os.path.join(CONTENT_DIR, filename)
+        for root, _, files in os.walk(CONTENT_DIR):
+            for filename in files:
+                if not filename.endswith(".md"):
+                    continue
+                
+                filepath = os.path.join(root, filename)
                 page_data, html_content = parse_file(
                     filepath, pygments_theme, site_config.get("markdown")
                 )
@@ -869,42 +883,29 @@ def main():
                     continue
                 if str(page_data.get("draft")).lower() in ("true", "1", "yes"):
                     continue
-                slug = os.path.splitext(filename)[0]
-                current_slugs.add(slug)
+                
+                # Determine slug/key for caching mechanism
+                # We use the relative path without extension as the key
+                rel_path = os.path.relpath(filepath, CONTENT_DIR)
+                slug_key = os.path.splitext(rel_path)[0].replace(os.sep, "/")
+                current_slugs.add(slug_key)
+
                 pages.append({"data": page_data, "content": html_content})
                 sitemap_list.append(page_data["url"])
-
-        if os.path.exists(POSTS_DIR):
-            for filename in os.listdir(POSTS_DIR):
-                if filename.endswith(".md"):
-                    filepath = os.path.join(POSTS_DIR, filename)
-                    page_data, html_content = parse_file(
-                        filepath, pygments_theme, site_config.get("markdown")
-                    )
-                    if not page_data:
-                        continue
-                    if str(page_data.get("draft")).lower() in ("true", "1", "yes"):
-                        continue
-                    slug = os.path.splitext(filename)[0]
-                    current_slugs.add(f"posts/{slug}")
-                    pages.append({"data": page_data, "content": html_content})
-                    sitemap_list.append(page_data["url"])
-                    if page_data.get("layout") == "post":
-                        all_posts.append(page_data)
-                        for tag in page_data.get("tags") or []:
-                            tags.setdefault(tag, []).append(page_data)
+                
+                if page_data.get("layout") == "post":
+                    all_posts.append(page_data)
+                    for tag in page_data.get("tags") or []:
+                         tags.setdefault(tag, []).append(page_data)
 
         removed = previous_slugs - current_slugs
         for slug in removed:
-
-            if slug.startswith("posts/"):
-                continue
-            if slug == "index":
-                continue
-            out_dir = os.path.join(OUTPUT_DIR, slug)
-            if os.path.isdir(out_dir):
-                shutil.rmtree(out_dir)
-                print(f"Removed stale page directory: {out_dir}")
+             if slug == "index":
+                 continue
+             out_dir = os.path.join(OUTPUT_DIR, slug)
+             if os.path.isdir(out_dir):
+                 shutil.rmtree(out_dir, ignore_errors=True)
+                 print(f"Removed stale page directory: {out_dir}")
 
         save_current_slugs(current_slugs)
 
