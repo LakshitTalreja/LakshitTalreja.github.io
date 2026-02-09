@@ -3,12 +3,12 @@
 {% block content %}
   <div class="hero rounded-lg">
     <div class="hero-content flex-col lg:flex-row-reverse"> {% if page.hero_image %}
-        <img src="{{ page.hero_image }}" class="max-w-xs md:max-w-sm rounded-lg" />
+        <img src="/photos/1.jpeg" class="max-w-xs md:max-w-sm rounded-lg" />
       {% endif %}
 
       <div class="max-w-md">
-        <h1 class="text-5xl font-bold">Hello, I'm {{ page.hero_title }} 👋</h1>
-        <p class="py-6">{{ page.hero_subtitle }}</p>
+        <h1 class="text-5xl font-bold">Access granted: welcome to my mind.</h1>
+        <p class="py-6">I’m Lakshit, a first year CSE student who runs on caffeine and an unhealthy amount of pop culture.</p>
 
         <div class="join">
             {% for link in page.social_links %}
@@ -34,10 +34,10 @@
 
   <div class="card w-full bg-base-200 shadow-xl">
     <div class="card-body">
-      <h2 class="card-title">My Blog</h2>
-      <p>A collection of my thoughts, findings, and technical deep-dives.</p>
-      <div class="card-actions justify-end">
-        <a href="/blog/" class="btn btn-primary">Read Now</a>
+      <h2 class="card-title">Generated using mettu.</h2>
+      <p>This site is generated using mettu, the SSG made by Andey Hemanth</p>
+      <div class="card-actions justify-middle">
+        <a href="https://github.com/Andy34G7/mettu" class="btn btn-primary">Mettu</a>
       </div>
     </div>
   </div>

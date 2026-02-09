@@ -1,12 +1,13 @@
-site_name: "site"
+site_name: "Lakshit's corner"
 author: "you"
 base_url: "you.com"
 
 theme:
-  default: "hacktoberfest25"
+  default: "coffee"
   include:
     - "hacktoberfest25"
     - "dracula"
+    - "coffee"
   custom:
     hacktoberfest25: |
       /* Raw CSS Theme */
@@ -75,3 +76,7 @@ navigation:
     url: "/"
   - name: "Blog"
     url: "/blog/"
+  - name: "Pictures"
+    url: "/pics/"
+  - name: "Projects"
+    url: "/Projects/"
