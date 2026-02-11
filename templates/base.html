@@ -54,8 +54,8 @@ site.theme.default is defined else (site.theme if site.theme is defined else "dr
 
   <!-- LAST.FM SCRIPT -->
   <script>
-  const API_KEY = "5f7ae3b17413db14e81ed1423684db51";
-  const USER = "talrejalakshit";
+  const API_KEY = "{{ site.lastfm_api_key }}";
+  const USER = "{{ site.lastfm_user }}";
 
   async function loadLastPlayed() {
     try {

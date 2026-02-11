@@ -80,3 +80,6 @@ navigation:
     url: "/pics/"
   - name: "Projects"
     url: "/Projects/"
+
+lastfm_api_key: "5f7ae3b17413db14e81ed1423684db51"
+lastfm_user: "talrejalakshit"
