@@ -12,6 +12,6 @@ social_links:
       url: "https://www.linkedin.com/in/lakshit-talreja-649574273/"
       icon: "linkedin"
     - name: "Instagram"
-      url: "https://instagram.com/yourusername"
+      url: "https://instagram.com/talrejalakshit"
       icon: "instagram"
 ---
