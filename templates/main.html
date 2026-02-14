@@ -21,10 +21,76 @@
             {% endfor %}
         </div>
         
-        <div class="mt-8">
-            <a href="/contact.html" class="btn btn-primary">Contact Me</a>
-            <a href="/resume.pdf" class="btn btn-outline ml-4">Download Resume</a>
-        </div>
+        <div class="mt-8 flex items-center gap-4">
+
+  <!-- Contact Button -->
+  <label for="contact-modal" class="btn btn-primary cursor-pointer">
+    Contact Me
+  </label>
+
+  <!-- Modal Toggle -->
+  <input type="checkbox" id="contact-modal" class="modal-toggle" />
+
+  <!-- Modal -->
+  <div class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Let’s Trade Thoughts.</h3>
+
+      <div class="space-y-3">
+
+        <p>
+          📧 Email:
+          <a href="mailto:talrejalakshit@acm.org"
+             class="link link-primary">
+             talrejalakshit@acm.org
+          </a>
+        </p>
+
+        <p>
+          💼 LinkedIn:
+          <a href="https://www.linkedin.com/in/lakshit-talreja-649574273/"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="link link-primary">
+             linkedin.com/in/lakshit-talreja
+          </a>
+        </p>
+
+        <p>
+          💻 GitHub:
+          <a href="https://github.com/LakshitTalreja"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="link link-primary">
+             github.com/LakshitTalreja
+          </a>
+        </p>
+
+        <p>
+          🐦 Twitter:
+          <a href="https://twitter.com/LakshitTalreja"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="link link-primary">
+             @LakshitTalreja
+          </a>
+        </p>
+
+      </div>
+
+      <div class="modal-action">
+        <label for="contact-modal" class="btn">Close</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume Button -->
+  <a href="/resume.pdf" class="btn btn-outline">
+    Download Resume
+  </a>
+
+</div>
+
       </div>
 
     </div>
