@@ -107,8 +107,6 @@ images:
 
 
 navigation:
-  - name: "Home"
-    url: "/"
   - name: "Blog"
     url: "/blog/"
   - name: "Pictures"
