@@ -10,14 +10,20 @@ site.theme.default is defined else (site.theme if site.theme is defined else "dr
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/syntax.css">
   <link rel="icon" type="image/svg+xml" href="/templates/icons/toppage.svg">
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
 
 </head>
 
-<body class="pt-24 min-h-screen flex flex-col">
+<body class="pt-24 min-h-screen flex flex-col {% if page.url == '/' %}overflow-hidden{% endif %}"></body>
 
   <div class="navbar bg-base-100 fixed top-0 left-0 z-50">
     <div class="flex-1">
-      <a href="/" class="btn btn-ghost text-xl">{{ site.site_name }}</a>
+      <a href="/" class="btn btn-ghost">
+        <img src="/assets/images/gaa2.png" alt="Lakshit's Corner" class="h-16 w-auto object-contain">
+      </a>
     </div>
     <div class="flex-none">
       <ul class="menu menu-horizontal px-1">
@@ -32,6 +38,7 @@ site.theme.default is defined else (site.theme if site.theme is defined else "dr
     {% block content %}{% endblock %}
   </main>
 
+  {% if page.url != "/" %}
   <!-- 🎵 LAST.FM MUSIC BAR -->
 <div id="music-bar"
   class="bg-base-300 w-full border-t">
@@ -58,10 +65,10 @@ site.theme.default is defined else (site.theme if site.theme is defined else "dr
 </div>
 <!-- END MUSIC BAR -->
 
-
   <footer class="mt-auto w-full text-center py-6">
     Error 404: Sleep not found.
   </footer>
+  {% endif %}
 
   <!-- LAST.FM SCRIPT -->
   <script>
@@ -93,6 +100,19 @@ site.theme.default is defined else (site.theme if site.theme is defined else "dr
   loadLastPlayed();
   setInterval(loadLastPlayed, 30000);
   </script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$", right: "$", display: false},
+      {left: "\\[", right: "\\]", display: true},
+      {left: "\\(", right: "\\)", display: false}
+    ]
+  });
+});
+</script>
 
 </body>
 </html>

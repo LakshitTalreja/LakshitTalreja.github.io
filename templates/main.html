@@ -1,124 +1,286 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="hero rounded-lg">
-    <div class="hero-content flex-col lg:flex-row-reverse"> {% if page.hero_image %}
-        <img src="/photos/1.jpeg" class="max-w-xs md:max-w-sm rounded-lg" />
-      {% endif %}
+
+<!-- SECTION 1 -->
+<section id="section1" class="h-screen pt-24 flex items-center justify-center px-6">
+  <div class="hero">
+    <div class="hero-content flex-col lg:flex-row-reverse gap-12">
+
 
       <div class="max-w-md">
-        <h1 class="text-5xl font-bold">Access granted: welcome to my mind.</h1>
-        <p class="py-6">I’m Lakshit, a first year CSE student who runs on caffeine and an unhealthy amount of pop culture.</p>
+        <h1 class="text-5xl font-bold">
+          Good morning, I see my asssassins have failed.
+        </h1>
 
-        <div class="join">
-            {% for link in page.social_links %}
-                <a href="{{ link.url }}" class="btn btn-ghost btn-square join-item" aria-label="{{ link.name }}">
-                    {# Dynamically include the SVG file based on the 'icon' key #}
-                    {% if link.icon %}
-                        {% include "icons/" + link.icon + ".svg" %}
-                    {% endif %}
-                </a>
-            {% endfor %}
-        </div>
-        
-        <div class="mt-8 flex items-center gap-4">
+        <p class="py-6">
+          I’m Lakshit, a first year CSE student who runs on caffeine
+          and an unhealthy amount of pop culture.
+        </p>
 
-  <!-- Contact Button -->
-  <label for="contact-modal" class="btn btn-primary cursor-pointer">
-    Contact Me
-  </label>
+        <button onclick="goToSection(1)" class="btn btn-primary">
+          Learn More
+        </button>
+      </div>
 
-  <!-- Modal Toggle -->
-  <input type="checkbox" id="contact-modal" class="modal-toggle" />
+    </div>
+  </div>
+</section>
 
-  <!-- Modal -->
-  <div class="modal">
-    <div class="modal-box">
-      <h3 class="font-bold text-lg mb-4">Let’s Trade Thoughts.</h3>
 
-      <div class="space-y-3">
+<!-- SECTION 2 -->
+<section id="section2" class="min-h-screen pt-24 flex items-center justify-center px-6 bg-base-200">
+  <div class="max-w-6xl w-full flex flex-col md:flex-row items-center gap-12">
+
+    <!-- LEFT SIDE (TEXT) -->
+    <div class="flex-1 text-left">
+      <h2 class="text-4xl font-bold mb-6">About Me</h2>
+
+      <p class="text-lg leading-relaxed">
+        First-year CS Student @ PES University
+        I’m a builder driven by a "ground-up" curiosity. 
+        I enjoy the process of constructing and understanding complex systems, from the logic of Machine Learning to the architecture of the web.
+        I’m a firm believer in simple design, observability, and the idea that the best way to understand a system is to learn how it was built from scratch.
+
+        Beyond the terminal, I’m a student of stories and ideas. I have a deep love for movies, TV shows, anime, and books, and I’m fascinated by how technology and culture influence one another.
+      </p>
+
+      <div class="mt-8">
+        <button onclick="goToSection(2)" class="btn btn-outline">
+          Get In Touch
+        </button>
+      </div>
+    </div>
+
+    <!-- VERTICAL DIVIDER -->
+    <div class="hidden md:block w-px bg-base-content opacity-20 h-64"></div>
+
+    <!-- RIGHT SIDE (IMAGE + CREDIT) -->
+<div class="flex-1 flex flex-col items-center">
+
+  <img 
+    src="/photos/1.jpeg"
+    class="max-w-xs md:max-w-sm rounded-lg shadow-2xl"
+  />
+
+  <p class="mt-4 text-sm opacity-60">
+    Photo by 
+    <a  
+      href="https://instagram.com/Kalyani"
+      target="_blank"
+      class="hover:underline hover:opacity-100 transition"  
+    >
+      @Kalyani.frames
+    </a>
+  </p>
+
+</div>
+
+  </div>
+</section>
+
+<!-- SECTION 3 -->
+<section id="section3" class="h-screen pt-24 flex flex-col justify-between">
+    <!-- CENTER CONTENT -->
+<div class="flex flex-grow items-center justify-center">
+
+  <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16 px-8">
+
+    <!-- LEFT SIDE -->
+    <div class="text-left md:pr-12">
+
+      <h2 class="text-5xl font-bold mb-8">Contact Me</h2>
+
+      <div class="space-y-4 text-lg">
 
         <p>
-          📧 Email:
           <a href="mailto:talrejalakshit@acm.org"
              class="link link-primary">
-             talrejalakshit@acm.org
+            talrejalakshit@acm.org
           </a>
         </p>
 
         <p>
-          💼 LinkedIn:
           <a href="https://www.linkedin.com/in/lakshit-talreja-649574273/"
              target="_blank"
-             rel="noopener noreferrer"
              class="link link-primary">
-             linkedin.com/in/lakshit-talreja
+            LinkedIn
           </a>
         </p>
 
         <p>
-          💻 GitHub:
           <a href="https://github.com/LakshitTalreja"
              target="_blank"
-             rel="noopener noreferrer"
              class="link link-primary">
-             github.com/LakshitTalreja
+            GitHub
           </a>
         </p>
 
         <p>
-          🐦 Twitter:
           <a href="https://twitter.com/LakshitTalreja"
              target="_blank"
-             rel="noopener noreferrer"
              class="link link-primary">
-             @LakshitTalreja
+            Twitter
           </a>
+        </p>
+        
+        <p>
+          <a href="https://instagram.com/talrejalakshit"
+             target="_blank"
+             class="link link-primary">
+            Instagram
+          </a>
+        </p>
+      </div>
+
+      <div class="mt-10">
+        <button onclick="goToSection(0)" class="btn btn-primary">
+          Back to Top
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="relative md:pl-12">
+
+      <!-- Vertical Divider -->
+      <div class="hidden md:block absolute left-0 top-0 h-full w-px bg-base-content opacity-20"></div>
+
+      <div class="pl-0 md:pl-10">
+
+        <h3 class="text-3xl font-semibold mb-6">
+          What I’m Up To
+        </h3>
+
+        <p class="text-lg leading-relaxed opacity-80 mb-6">
+          Currently exploring machine learning,
+          and leading a student research team on analysing
+          if any of the 4 methods used to regularise 
+          Representation models have something in common,
+          and how they could help speed up training world models.
+        </p>
+
+        <p class="opacity-70 mb-6">
+          I like systems that feel intentional —
+          smooth transitions, thoughtful layouts,
+          and just enough personality.
+        </p>
+
+        <p class="font-medium">
+          If you have something ambitious in mind,
+          let’s build it properly.
         </p>
 
       </div>
 
-      <div class="modal-action">
-        <label for="contact-modal" class="btn">Close</label>
+    </div>
+
+  </div>
+
+</div>
+  <!-- MUSIC BAR (copied from base.html) -->
+  <div class="bg-base-300 w-full border-t">
+    <div class="px-8 py-6 flex items-center justify-between">
+
+      <div class="flex items-center gap-4">
+        <img id="cover" src="/photos/placeholder.jpg"
+             class="w-12 h-12 rounded-md" />
+
+        <div>
+          <p class="text-sm opacity-60">🎵 Last played:</p>
+          <p id="song" class="font-bold text-lg">Loading...</p>
+          <p id="artist" class="text-sm opacity-70"></p>
+        </div>
       </div>
+
+      <a href="https://open.spotify.com/user/e2bxcqv1bylokq9d4hf0flmmm?si=Uh8SHFqjSRyjlTquDwkWCg"
+         class="btn btn-ghost">
+         Check out my spotify
+      </a>
+
     </div>
   </div>
 
-  <!-- Resume Button -->
-  <a href="/resume.pdf" class="btn btn-outline">
-    Download Resume
+  <!-- FOOTER -->
+  <footer class="w-full text-center py-6 text-sm opacity-70">
+  <a 
+    href="https://github.com/Andy34G7/mettu"
+    target="_blank"
+    class="hover:underline hover:opacity-100 transition">
+    This site is generated using mettu.
   </a>
+</footer>
 
-</div>
+</section>
 
-      </div>
 
-    </div>
-  </div>
-
-  <div class="divider my-12"></div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  <div class="card w-full bg-base-200 shadow-xl">
-    <div class="card-body">
-      <h2 class="card-title">Generated using mettu.</h2>
-      <p>This site is generated using mettu, the SSG made by Andey Hemanth</p>
-      <div class="card-actions justify-middle">
-        <a href="https://github.com/Andy34G7/mettu" class="btn btn-primary">Mettu</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="card w-full bg-base-200 shadow-xl">
-    <div class="card-body">
-      <h2 class="card-title">Picture Credit: Kalyani Puranik</h2>
-      <div class="card-actions justify-middle">
-        <a href="https://www.instagram.com/kalyani.frames?igsh=MXJsY3p1NHhsYjkwNA==" class="btn btn-primary">Kalyani.frames</a>
-      </div>
-    </div>
-  </div>
+<!-- RIGHT SIDE NAV DOTS -->
+<div class="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-50">
+  <button onclick="goToSection(0)" class="dot"></button>
+  <button onclick="goToSection(1)" class="dot"></button>
+  <button onclick="goToSection(2)" class="dot"></button>
 </div>
 
 
+<!-- SLIDE CONTROLLER SCRIPT -->
+<script>
+const sections = document.querySelectorAll("section");
+let currentSection = 0;
+let isScrolling = false;
+
+function goToSection(index) {
+  if (index < 0 || index >= sections.length) return;
+
+  isScrolling = true;
+  currentSection = index;
+
+  sections[index].scrollIntoView({ behavior: "smooth" });
+  history.replaceState(null, null, "#" + sections[index].id);
+
+  setTimeout(() => {
+    isScrolling = false;
+  }, 700);
+}
+
+window.addEventListener("wheel", (e) => {
+  if (isScrolling) return;
+
+  if (e.deltaY > 0) {
+    goToSection(currentSection + 1);
+  } else {
+    goToSection(currentSection - 1);
+  }
+});
+
+// On page load, go to hash if exists
+window.addEventListener("load", () => {
+  const id = window.location.hash.replace("#", "");
+  const index = [...sections].findIndex(s => s.id === id);
+  if (index !== -1) {
+    goToSection(index);
+  }
+});
+</script>
+
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #9ca3af;
+  transition: 0.3s;
+}
+
+.dot:hover {
+  background: #3b82f6;
+}
+</style>
 
 {% endblock %}
