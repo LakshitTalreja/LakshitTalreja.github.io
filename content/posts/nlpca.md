@@ -1,6 +1,6 @@
 ---
 title: "NLPCA Mark Kramer (1991)"
-date: "2025-2-15"
+date: "2025-02-26"
 layout: "post"
 tags:
     - "machine learning"
