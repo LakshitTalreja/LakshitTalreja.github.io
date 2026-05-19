@@ -10,11 +10,11 @@ tags:
 ---
 
 # Introduction 
-Before I dive into today's topic, I want to address what this page is. In a nutshellsit is a section of my site I will be using to add my thoughts and learnings *daily*. Just something to hold me accountable and to document my learnings and progress.
+Before I dive into today's topic, I want to address what this page is. In a nutshell it is a section of my site I will be using to add my thoughts and learnings *daily*. Just something to hold me accountable and to document my learnings and progress.
 
 # LLM optimisation 
 Why this topic? 
-Well the answer is a little stupid to be honest but because someone sent me this link(Hemanth) and I opened it and read like 5 lines and told myself I'll get back to it soon but honestly havent opened it since and it remained in my open tabs(a problem i should really solve) so I decided to read it
+Well the answer is a little stupid to be honest but because someone sent me this link(Hemanth) and I opened it and read like 5 lines and told myself I'll get back to it soon but honestly havent opened it since and it remained in my open tabs(a problem i should really solve) so I decided to read it today.
 
 [The article](https://medium.com/@dinukajkdy/decoding-the-dragon-why-llm-performance-is-a-two-part-problem-49d368a357a5)
 
@@ -41,8 +41,10 @@ O(n) - Time increases proportionally with input size
 O(n2) - Time increases proportionally to the square of the input size 
 
 ok coming back to the first blog,
->  As the input sequence length ($N$) doubles, the computation effort quadruples. This quadratic explosion is what makes handling long contexts expensive and slow, and it directly shapes the two phases of inference.
-**This makes sense now**
+>  As the input sequence length (N) doubles, the computation effort quadruples. This quadratic explosion is what makes handling long contexts expensive and slow, and it directly shapes the two phases of inference.
+
+
+**This makes sense to me now**
 
 To solve this issue engineers have implemented 2 solutions 
 - Multi Query Attention - Multiple heads share the same key and value matrices reducing the memory footprint.
