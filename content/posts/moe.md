@@ -34,7 +34,7 @@ But that doesnt mean that there 256 players on the field, the router looks throu
 But they also have something known as **Shared Experts** that is essentially the experts that are always active, this would be like the star player that is always on the field while the others keep swapping in and out. This is done because each input requires some knowledge.
 
 # Basic design of MoE
-![Design of MoE](/assets/images/MoE/Screenshot%202026-04-11%20013717.png)
+![Design of MoE](/assets/images/MoE/design_of_moe.png)
 To understand this architecture lets break it down into smaller sections, putting it simply there is the input, output and the MoE layer.
 In the MoE layer we have the Router/ Gating function and the then the experts.
 
@@ -46,7 +46,7 @@ How to select a Gating function, the function must follow few criteria
 There are a few types of gating functions and the ones I'll be going over are the Linear, Non Linear and Sigmoid Gating functions 
 ### Linear Gating function / Softmax Gating 
 Most existing MoE models use a linear **Softmax** function as their gating function due to its simplicity and effectiveness.
-![Linear Gating](/assets/images/MoE/Screenshot%202026-04-14%20230443.png)
+![Linear Gating](/assets/images/MoE/linear_gating.png)
 OK so this is the general equation for linear gating so lets break down the terms and why we need them.
 G is the gating function, TopK(...k) well what this function does is it takes a value for k and keeps the scores of the k best experts, then subtracts k from the total number of experts and to the remaining experts sets the score to minus infinity. This saves time and energy by only using k parameters at a time. Rnoise adds a little randomness to the to the scores to prevent the model using only one or two experts. g(x) is the score of each expert and finally the softmax() wrap converts the score to probabilities that add up to one.
 The score for the non selected experts was minus infinity so the probabilty is reduced to zero and therefore the model does not activate the expert.
@@ -54,12 +54,12 @@ The only disadvantage to this gating function is that softmax must be computed f
 
 ### Non linear Gating / Cosine based grating 
 This gating function is based on the cosine of the distance for domain generalization.
-![Non Linear Gating](/assets/images/MoE/Screenshot%202026-04-14%20232500.png)
+![Non Linear Gating](/assets/images/MoE/non_linear_gating.png)
 In the first gating function it asks itself the question *Whcih experts has the highest score* but in this function it asks the question *Which experts is the most similar to the given input*.
 The formula is defiently more complex but lets break it down as well, 
 Wlinear(x)- instead of calculating raw scores, it projects the input in a *hypersphere space* therefore aligning the inputs dimensionality with that of the experts.
 E is the expert embeddings, each expert is represented by learnable feaature vector. The cosine term is the 
-![Cosine Term](/assets/images/MoE/Screenshot%202026-04-15%20010417.png)
+![Cosine Term](/assets/images/MoE/cosine_term.png)
 It measures the angle between the input and the experts and selects the experts based on the angle, the experts with the smallest angles to the input are activated.
 Temperature, yup the last term is termperature(not the one we know) this acts as a confidence dial,
 low (eg. 0.1)- the top expert gets a large probabilty while others are 0.
@@ -67,7 +67,7 @@ high (eg. 2.0)- Probabilities are evenly spread out.
 
 ### Sigmoid Gating function (The function deepseek uses)
 This is the function that the deepseek model uses, in this model the function assigns all the experts a value between 0 and 1 indepedent of the other expert functions, this is done in systems where multiple experts may need to be active or not active at the same time without affecting the scores of the other experts.
-![Sigmoid](/assets/images/MoE/Screenshot%202026-04-15%20015954.png)
+![Sigmoid](/assets/images/MoE/sigmoid.png)
 Unlike softmax where increasing the score of one expert decreases the scores of the others(all must add to one) this function allows all the experts to have high(near 1) or low(near 0) scores simultaneously.
 It activates the experts like a activation function in a simple basic neural network, for example if G(x)>0.5 then it activates all the experts with gating values more than 0.5 
 
@@ -104,8 +104,8 @@ This is the basic premise of a model collapse in MoE, where few experts are regu
 *N. Shazeer, A. Mirhoseini, K. Maziarz, A. Davis, Q. Le, G. Hinton,and J. Dean, “Outrageously large neural networks: The sparsely-gated mixture-of-experts layer,” arXiv preprint arXiv:1701.06538, 2017.* 
 This is a paper where they attempt to solve this issue and I'm going to attempt to break down their method.
 They propose **Importance and Load Loss functions**  
-![Importance and Load loss](/assets/images/MoE/Screenshot%202026-04-15%20233609.png) 
-![Switch Transformer](/assets/images/MoE/Screenshot%202026-04-15%20233945.png)
+![Importance and Load loss](/assets/images/MoE/loss.png) 
+![Switch Transformer](/assets/images/MoE/transformer.png)
 In the switch Transformer it adds an Auxiliary loss that is essentially a penalty that forces the model to use all the experts  
 The switch transformer is the equation 12 where f is the real workload of the function and Q is the predicted interest, this is basically the term that tells us how much the router wanted to send the token to that specific expert even if it didnt end up sending it.
 The product of these terms is what the model is penalized on, if it has a high probability and a high number of tokens then it is penalized, to minimise this the model pushed both of these terms to 1/N(N is total number of experts) which is basically pushing it to an equal split for experts.
